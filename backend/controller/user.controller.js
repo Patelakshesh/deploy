@@ -38,7 +38,7 @@ export const register = async (req, res) => {
     await sendWelcomeEmail(email, fullname, verificationToken);
 
     return res.status(201).json({
-      message: "Account created successfully",
+      message: "Account created successfully. Please verify your email",
       success: true,
     });
   } catch (error) {
