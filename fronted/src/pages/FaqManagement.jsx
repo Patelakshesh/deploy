@@ -4,10 +4,12 @@ import Faqs from "../components/Faqs";
 import { USER_API_END_POINT } from "../utils/api";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useTranslation } from "react-i18next";
 
 export default function FaqManagement() {
   const [view, setView] = useState("categories"); 
   const navigate = useNavigate();
+  const {t,i18n} = useTranslation();
 
   const handleLogout = async () => {
     try {
@@ -29,7 +31,7 @@ export default function FaqManagement() {
   return (
     <div className="min-h-screen bg-gray-100 p-8">
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-3xl font-bold text-center mb-8">FAQ Management</h1>
+        <h1 className="text-3xl font-bold text-center mb-8">{t("faq_title")}</h1>
 
         <div className="flex gap-4 mb-8 justify-center">
           <button
@@ -58,6 +60,8 @@ export default function FaqManagement() {
     >
       Logout
     </button>
+    <button onClick={() => i18n.changeLanguage("fr")}>FR</button>
+    <button onClick={() => i18n.changeLanguage("en")}>EN</button>
         </div>
 
         {/* Render the appropriate component */}
