@@ -1,49 +1,52 @@
 import axios from "axios";
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import * as Yup from 'yup'
+import * as Yup from "yup";
 import { USER_API_END_POINT } from "../utils/api";
 import { useFormik } from "formik";
 
 export default function LoginPage() {
   const navigate = useNavigate();
   const validationSchema = Yup.object({
-      email: Yup.string().email("Invalid email format").required("Email is required"),
-      password: Yup.string()
+    email: Yup.string()
+      .email("Invalid email format")
+      .required("Email is required"),
+    password: Yup.string()
       .min(6, "Password must be at least 6 characters")
       .matches(/[a-zA-Z]/, "Must contain at least one letter")
       .matches(/[0-9]/, "Must contain at least one number")
       .required("Password is required"),
     role: Yup.string().required("Please select a role"),
-    })
+  });
 
-    const formik = useFormik({
-        initialValues: {
-          email: '',
-          password: '',
-          role: '',
-        },
-        validationSchema,
-        onSubmit: async (values, {setSubmitting}) => {
-          try {
-            const res = await axios.post(`${USER_API_END_POINT}/login`,  values, {
-              headers: {
-                "Content-Type": "application/json"
-              },
-              withCredentials: true,
-            })
-            if(res.data.success){
-              localStorage.setItem("token", res.data.token); 
-              navigate('/')
-              alert(res.data.message);
-            }
-          }  catch (error) {
-            alert(error.response?.data?.message || "Verify you email");
-          }
-          setSubmitting(false);
+  const formik = useFormik({
+    initialValues: {
+      email: "",
+      password: "",
+      role: "",
+    },
+    validationSchema,
+    onSubmit: async (values, { setSubmitting }) => {
+      try {
+        const res = await axios.post(`${USER_API_END_POINT}/login`, values, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        });
+        if (res.data.success) {
+          localStorage.setItem("token", res.data.token);
+
+          localStorage.setItem("user", JSON.stringify(res.data.user));
+          navigate("/");
+          alert(res.data.message);
         }
-
-      })
+      } catch (error) {
+        alert(error.response?.data?.message || "Verify you email");
+      }
+      setSubmitting(false);
+    },
+  });
   return (
     <>
       <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
@@ -54,7 +57,7 @@ export default function LoginPage() {
         </div>
 
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-          <form className="space-y-6"onSubmit={formik.handleSubmit}>
+          <form className="space-y-6" onSubmit={formik.handleSubmit}>
             <div>
               <label
                 htmlFor="email"
@@ -102,7 +105,9 @@ export default function LoginPage() {
                   className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                 />
                 {formik.touched.password && formik.errors.password && (
-                  <p className="text-red-500 text-sm">{formik.errors.password}</p>
+                  <p className="text-red-500 text-sm">
+                    {formik.errors.password}
+                  </p>
                 )}
               </div>
             </div>
@@ -144,7 +149,7 @@ export default function LoginPage() {
               </div>
             </div>
             <div>
-            {formik.touched.role && formik.errors.role && (
+              {formik.touched.role && formik.errors.role && (
                 <p className="text-red-500 text-sm">{formik.errors.role}</p>
               )}
               <button
@@ -158,7 +163,7 @@ export default function LoginPage() {
             <p className="text-sm font-light text-gray-500 dark:text-gray-400">
               Don't have an account?{" "}
               <Link
-               to={'/register'}
+                to={"/register"}
                 className="font-medium text-primary-600 hover:underline dark:text-primary-500"
               >
                 Register here

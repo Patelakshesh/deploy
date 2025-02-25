@@ -4,25 +4,23 @@ import axios from "axios";
 export default function FaqManagement() {
   const [categories, setCategories] = useState([]);
   const [newCategory, setNewCategory] = useState("");
-  const [user, setUser] = useState(null); // Define user state
+  const [user, setUser] = useState(null); 
 
-  // Fetch user details (assuming stored in localStorage)
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
-    setUser(storedUser);
+   setUser(storedUser)
   }, []);
 
-  // Fetch all FAQ categories
   const fetchCategories = async () => {
     try {
       const response = await axios.get("http://localhost:8000/api/v1/faq-categories/list");
-      setCategories(response.data.categories || []); // Ensure correct data extraction
+
+      setCategories(response.data); // Ensure correct data extraction
     } catch (error) {
       console.error("Error fetching categories:", error.response || error.message);
     }
   };
 
-  // Add a new FAQ category
   const handleAddCategory = async (e) => {
     e.preventDefault();
     if (!newCategory.trim()) {
@@ -49,16 +47,16 @@ export default function FaqManagement() {
     }
   };
 
-  // Fetch categories on component mount
   useEffect(() => {
-    fetchCategories();
-  }, []);
+    if (user) {
+      fetchCategories();
+    }
+  }, [user]);
 
   return (
     <div className="min-h-screen bg-gray-100 p-8">
       <h1 className="text-3xl font-bold text-center mb-8">FAQ Category Management</h1>
 
-      {/* Add Category Form (Visible only if user is admin) */}
       {user?.role === "admin" && (
         <div className="max-w-md mx-auto bg-white p-6 rounded-lg shadow-md mb-8">
           <h2 className="text-xl font-semibold mb-4">Add New FAQ Category</h2>
@@ -77,7 +75,6 @@ export default function FaqManagement() {
         </div>
       )}
 
-      {/* List Categories Table */}
       <div className="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-md">
         <h2 className="text-xl font-semibold mb-4">FAQ Categories</h2>
         <table className="min-w-full divide-y divide-gray-200">

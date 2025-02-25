@@ -5,6 +5,7 @@ import {createBrowserRouter, Navigate, RouterProvider} from 'react-router-dom'
 import ChangePassword from './pages/ChangePassword'
 import FaqManagement from './pages/FaqManagement'
 import './i18n'
+
 const PrivateRoute = ({children}) => {
   const token = localStorage.getItem('token');
   return token ? children : <Navigate to={'/login'}/>
