@@ -1,23 +1,32 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import { setLoading } from "../redux/authSlice";
+import { Loader2 } from "lucide-react";
 
 export default function FaqManagement() {
   const [categories, setCategories] = useState([]);
   const [newCategory, setNewCategory] = useState("");
-  const [user, setUser] = useState(null); 
-
+  const [user, setUser] = useState(null);
+  const { loading } = useSelector((store) => store.auth);
+  const dispatch = useDispatch();
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
-   setUser(storedUser)
+    setUser(storedUser);
   }, []);
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get("http://localhost:8000/api/v1/faq-categories/list");
+      const response = await axios.get(
+        "http://localhost:8000/api/v1/faq-categories/list"
+      );
 
       setCategories(response.data); // Ensure correct data extraction
     } catch (error) {
-      console.error("Error fetching categories:", error.response || error.message);
+      console.error(
+        "Error fetching categories:",
+        error.response || error.message
+      );
     }
   };
 
@@ -27,12 +36,22 @@ export default function FaqManagement() {
       alert("Category name is required!");
       return;
     }
-
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("Authentication token is missing! Please log in again.");
+      return;
+    }
     try {
-      const response = await axios.post("http://localhost:8000/api/v1/faq-categories/add", {
-        faq_cat_name: newCategory,
-      });
-
+      dispatch(setLoading(true));
+      const response = await axios.post(
+        "http://localhost:8000/api/v1/faq-categories/add",
+        {
+          faq_cat_name: newCategory,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` }, // Send token
+        }
+      );
       if (response.data && response.data.category) {
         setCategories((prev) => [...prev, response.data.category]);
       } else {
@@ -44,6 +63,8 @@ export default function FaqManagement() {
     } catch (error) {
       console.error("Error adding category:", error.response || error.message);
       alert("Failed to add category. Please try again.");
+    } finally {
+      dispatch(setLoading(false));
     }
   };
 
@@ -55,7 +76,9 @@ export default function FaqManagement() {
 
   return (
     <div className="min-h-screen bg-gray-100 p-8">
-      <h1 className="text-3xl font-bold text-center mb-8">FAQ Category Management</h1>
+      <h1 className="text-3xl font-bold text-center mb-8">
+        FAQ Category Management
+      </h1>
 
       {user?.role === "admin" && (
         <div className="max-w-md mx-auto bg-white p-6 rounded-lg shadow-md mb-8">
@@ -68,9 +91,19 @@ export default function FaqManagement() {
               placeholder="Enter category name"
               className="w-full p-2 border rounded"
             />
-            <button type="submit" className="w-full bg-blue-500 text-white p-2 rounded">
-              Add Category
-            </button>
+            {loading ? (
+              <button className="w-full bg-blue-500 text-white p-2 rounded">
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Please wait
+              </button>
+            ) : (
+              <button
+                type="submit"
+                className="w-full bg-blue-500 text-white p-2 rounded"
+              >
+                Add Category
+              </button>
+            )}
           </form>
         </div>
       )}
@@ -95,7 +128,9 @@ export default function FaqManagement() {
                   {category.faq_cat_name}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {category.createdAt ? new Date(category.createdAt).toLocaleString() : "N/A"}
+                  {category.createdAt
+                    ? new Date(category.createdAt).toLocaleString()
+                    : "N/A"}
                 </td>
               </tr>
             ))}

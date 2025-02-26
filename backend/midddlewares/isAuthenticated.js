@@ -3,9 +3,9 @@ import { User } from '../models/User.models.js';
 
 const isAuthenticatedd = async (req, res, next) => {
     try{
-        console.log("Received Cookies:", req.cookies);
-        const token = req.cookies.token; 
-        console.log("Extracted Token:", token); 
+        
+        const token = req.cookies.token || req.headers.authorization?.split(" ")[1]; 
+       
         if(!token){
             return res.status(401).json({
                 message: "User not Authenticated",

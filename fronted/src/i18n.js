@@ -5,14 +5,14 @@ import enTranslation from "./locales/en.json";
 import frTranslation from "./locales/fr.json";
 
 i18n
-  .use(initReactI18next) // Pass i18n instance to react-i18next
+  .use(initReactI18next)
   .init({
     resources: {
       en: { translation: enTranslation },
       fr: { translation: frTranslation }
     },
-    lng: "en", // Default language
-    fallbackLng: "en", // Fallback language if the selected one is missing
+    lng: "en", 
+    fallbackLng: "en", 
     interpolation: { escapeValue: false }
   });
 
