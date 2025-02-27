@@ -19,7 +19,7 @@ app.use(express.urlencoded({extended: true}))
 app.use(cookieParser())
 
 const corsOption = {
-    origin: 'http://localhost:5173',
+    origin: 'https://deploy-7q6y.onrender.com',
     credentials: true
 }
 app.use(cors(corsOption))

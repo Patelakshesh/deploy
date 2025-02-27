@@ -18,7 +18,7 @@ export default function FaqManagement() {
   const fetchCategories = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:8000/api/v1/faq-categories/list"
+        "https://deploy-7q6y.onrender.com/api/v1/faq-categories/list"
       );
 
       setCategories(response.data);
@@ -44,7 +44,7 @@ export default function FaqManagement() {
     try {
       dispatch(setAddLoading(true));
       const response = await axios.post(
-        "http://localhost:8000/api/v1/faq-categories/add",
+        "https://deploy-7q6y.onrender.com/api/v1/faq-categories/add",
         {
           faq_cat_name: newCategory,
         },

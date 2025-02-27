@@ -26,7 +26,7 @@ export default function Faqs() {
   const fetchFaqs = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:8000/api/v1/faqs/list",
+        "https://deploy-7q6y.onrender.com/api/v1/faqs/list",
         {
           params: {
             page: pagination.page,
@@ -49,7 +49,7 @@ export default function Faqs() {
   const fetchCategories = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:8000/api/v1/faq-categories/list"
+        "https://deploy-7q6y.onrender.com/api/v1/faq-categories/list"
       );
       setCategories(response.data);
     } catch (error) {
@@ -61,7 +61,7 @@ export default function Faqs() {
     e.preventDefault();
     try {
       dispatch(setLoading(true));
-      await axios.post("http://localhost:8000/api/v1/faqs/add", newFaq);
+      await axios.post("https://deploy-7q6y.onrender.com/api/v1/faqs/add", newFaq);
 
       setNewFaq({ cat_id: "", question: "", answer: "" });
       fetchFaqs();
@@ -78,7 +78,7 @@ export default function Faqs() {
     try {
       dispatch(setLoading(true));
       await axios.put(
-        `http://localhost:8000/api/v1/faqs/edit/${editFaq._id}`,
+        `https://deploy-7q6y.onrender.com/api/v1/faqs/edit/${editFaq._id}`,
         editFaq
       );
       setEditFaq(null);
@@ -95,7 +95,7 @@ export default function Faqs() {
     if (window.confirm("Are you sure you want to delete this FAQ?")) {
       try {
         setDeletingFaqId(id);
-        await axios.delete(`http://localhost:8000/api/v1/faqs/delete/${id}`);
+        await axios.delete(`https://deploy-7q6y.onrender.com/api/v1/faqs/delete/${id}`);
         fetchFaqs();
         alert("FAQ deleted successfully!");
       } catch (error) {
