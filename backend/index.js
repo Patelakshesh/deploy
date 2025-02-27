@@ -7,9 +7,12 @@ import connectDB from './utiles/db.js'
 import userRoute from './router/user.route.js'
 import faqCategoryRoutes from './router/faqCategory.routes.js'
 import faqRoutes from './router/faq.routes.js'
+import path from 'path'
 dotenv.config({});
 
 const app = express()
+
+const _dirname = path.resolve();
 
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
@@ -26,6 +29,11 @@ const PORT = process.env.PORT || 3000;
 app.use('/api/v1/user', userRoute)
 app.use('/api/v1/faq-categories', faqCategoryRoutes)
 app.use('/api/v1/faqs', faqRoutes)
+
+app.use(express.static(path.join(_dirname, "/fronted/dist")))
+app.get('*', (_, res) => {
+    res.sendFile(path.resolve(_dirname, "fronted", "dist", "index.html"))
+})
 
 app.listen(PORT, () => {
     connectDB()
