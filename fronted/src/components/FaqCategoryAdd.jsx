@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
-import { setLoading } from "../redux/authSlice";
+import { setAddLoading, setLoading } from "../redux/authSlice";
 import { Loader2 } from "lucide-react";
 
 export default function FaqManagement() {
   const [categories, setCategories] = useState([]);
   const [newCategory, setNewCategory] = useState("");
   const [user, setUser] = useState(null);
-  const { loading } = useSelector((store) => store.auth);
+  const { addLoading } = useSelector((store) => store.auth);
   const dispatch = useDispatch();
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -21,7 +21,7 @@ export default function FaqManagement() {
         "http://localhost:8000/api/v1/faq-categories/list"
       );
 
-      setCategories(response.data); // Ensure correct data extraction
+      setCategories(response.data);
     } catch (error) {
       console.error(
         "Error fetching categories:",
@@ -42,7 +42,7 @@ export default function FaqManagement() {
       return;
     }
     try {
-      dispatch(setLoading(true));
+      dispatch(setAddLoading(true));
       const response = await axios.post(
         "http://localhost:8000/api/v1/faq-categories/add",
         {
@@ -64,7 +64,7 @@ export default function FaqManagement() {
       console.error("Error adding category:", error.response || error.message);
       alert("Failed to add category. Please try again.");
     } finally {
-      dispatch(setLoading(false));
+      dispatch(setAddLoading(false));
     }
   };
 
@@ -91,19 +91,20 @@ export default function FaqManagement() {
               placeholder="Enter category name"
               className="w-full p-2 border rounded"
             />
-            {loading ? (
-              <button className="w-full bg-blue-500 text-white p-2 rounded">
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Please wait
-              </button>
-            ) : (
-              <button
-                type="submit"
-                className="w-full bg-blue-500 text-white p-2 rounded"
-              >
-                Add Category
-              </button>
-            )}
+            <button
+              type="submit"
+              className="w-full bg-blue-500 text-white p-2 rounded"
+              disabled={addLoading} 
+            >
+              {addLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Please wait
+                </>
+              ) : (
+                "Add Category"
+              )}
+            </button>
           </form>
         </div>
       )}

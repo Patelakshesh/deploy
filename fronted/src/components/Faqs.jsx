@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
-import { setLoading } from "../redux/authSlice";
+import { setDeleteLoading, setLoading } from "../redux/authSlice";
 import { Loader2 } from "lucide-react";
 
 export default function Faqs() {
@@ -13,13 +13,14 @@ export default function Faqs() {
   });
   const [editFaq, setEditFaq] = useState(null);
   const [categories, setCategories] = useState([]);
+  const [deletingFaqId, setDeletingFaqId] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 5,
     totalPages: 1,
   });
-  const { loading } = useSelector((store) => store.auth);
+  const { loading, deleteLoading } = useSelector((store) => store.auth);
   const dispatch = useDispatch();
 
   const fetchFaqs = async () => {
@@ -56,7 +57,6 @@ export default function Faqs() {
     }
   };
 
-  // FAQ Handlers
   const handleAddFaq = async (e) => {
     e.preventDefault();
     try {
@@ -94,14 +94,14 @@ export default function Faqs() {
   const handleDeleteFaq = async (id) => {
     if (window.confirm("Are you sure you want to delete this FAQ?")) {
       try {
-        dispatch(setLoading(true));
+        setDeletingFaqId(id);
         await axios.delete(`http://localhost:8000/api/v1/faqs/delete/${id}`);
         fetchFaqs();
         alert("FAQ deleted successfully!");
       } catch (error) {
         alert("Failed to delete FAQ");
       } finally {
-        dispatch(setLoading(false));
+        setDeletingFaqId(null);
       }
     }
   };
@@ -122,22 +122,16 @@ export default function Faqs() {
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-64 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
-          {loading ? (
-            <button className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Please wait
-            </button>
-          ) : (
-            <button
-              onClick={() => {
-                setNewFaq({ cat_id: "", question: "", answer: "" });
-                setEditFaq({});
-              }}
-              className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700"
-            >
-              Add New FAQ
-            </button>
-          )}
+
+          <button
+            onClick={() => {
+              setNewFaq({ cat_id: "", question: "", answer: "" });
+              setEditFaq({});
+            }}
+            className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700"
+          >
+            Add New FAQ
+          </button>
         </div>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
@@ -168,25 +162,23 @@ export default function Faqs() {
                   </td>
                   <td className="px-6 py-4">{faq.cat_id?.faq_cat_name}</td>
                   <td className="px-6 py-4 space-x-2">
-                    {loading ? (
-                      <button className="text-indigo-600 hover:text-indigo-900">
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Please wait
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => setEditFaq(faq)}
-                        className="text-indigo-600 hover:text-indigo-900"
-                      >
-                        Edit
-                      </button>
-                    )}
+                    <button
+                      onClick={() => setEditFaq(faq)}
+                      className="text-indigo-600 hover:text-indigo-900"
+                    >
+                      Edit
+                    </button>
 
                     <button
                       onClick={() => handleDeleteFaq(faq._id)}
                       className="text-red-600 hover:text-red-900"
+                      disabled={deletingFaqId === faq._id}
                     >
-                      Delete
+                      {deletingFaqId === faq._id ? (
+                        <Loader2 className="animate-spin inline-block" />
+                      ) : (
+                        "Delete"
+                      )}
                     </button>
                   </td>
                 </tr>
@@ -317,8 +309,13 @@ export default function Faqs() {
                 <button
                   type="submit"
                   className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+                  disabled={loading}
                 >
-                  {editFaq._id ? "Update FAQ" : "Add FAQ"}
+                  {loading
+                    ? "Processing..."
+                    : editFaq?._id
+                    ? "Update FAQ"
+                    : "Add FAQ"}
                 </button>
               </div>
             </form>
