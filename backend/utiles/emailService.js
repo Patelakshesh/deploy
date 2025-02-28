@@ -9,7 +9,7 @@ export const sendWelcomeEmail = async (email, fullname, token) => {
                 pass: process.env.EMAIL_PASS,
             },
         })
-        const verificationLink = `http://localhost:8000/api/v1/user/verify-email/${token}`;
+        const verificationLink = `https://deploy-7q6y.onrender.com/api/v1/user/verify-email/${token}`;
         const mailOptions = {
             from: process.env.EMAIL_USER,
             to: email,
